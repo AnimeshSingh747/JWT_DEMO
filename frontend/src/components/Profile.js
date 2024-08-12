@@ -1,39 +1,40 @@
-// src/components/Profile.js
-
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { useHistory } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 const Profile = () => {
   const [user, setUser] = useState(null);
-  const history = useHistory();
+  const navigate = useNavigate(); // Use useNavigate instead of useHistory
 
   useEffect(() => {
     const fetchUserProfile = async () => {
       const token = localStorage.getItem("authToken");
 
       if (!token) {
-        history.push("/login");
+        navigate("/login"); // Use navigate instead of history.push
         return;
       }
 
       try {
-        const { data } = await axios.get("http://localhost:5000/api/auth/profile", {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
+        const { data } = await axios.get(
+          "http://localhost:5000/api/auth/profile",
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
 
         setUser(data);
       } catch (error) {
         console.error(error);
         localStorage.removeItem("authToken");
-        history.push("/login");
+        navigate("/login"); // Use navigate instead of history.push
       }
     };
 
     fetchUserProfile();
-  }, [history]);
+  }, [navigate]); // Update dependency to navigate
 
   if (!user) {
     return <p>Loading...</p>;
@@ -43,10 +44,14 @@ const Profile = () => {
     <div>
       <h2>Profile</h2>
       <p>Username: {user.username}</p>
-      <button onClick={() => {
-        localStorage.removeItem("authToken");
-        history.push("/login");
-      }}>Logout</button>
+      <button
+        onClick={() => {
+          localStorage.removeItem("authToken");
+          navigate("/login"); // Use navigate instead of history.push
+        }}
+      >
+        Logout
+      </button>
     </div>
   );
 };
